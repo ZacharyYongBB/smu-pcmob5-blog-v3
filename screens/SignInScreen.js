@@ -9,16 +9,42 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
+
+
+const API = "https://pcmob5-blog-api.zacharyyong.repl.co";
+const API_LOGIN = "/auth";
 
 export default function SignInScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorText, setErrorText] = useState("");
 
-  function login() {
+  async function login() {
+    console.log("loggininloginloginin");
     Keyboard.dismiss();
-    // do stuff here to log in
+    
+
+    
+    try {
+      const response = await axios.post(API + API_LOGIN, {
+        username,
+        password,
+      });
+      console.log("log in success");
+      console.log(response);
+    
+
+      AsyncStorage.setItem("token", response.data.access_token);
+      navigation.navigate("Account");
+    } catch (error) {
+      console.log("error logging in");
+      console.log(error.response);
+
+      setErrorText(error.response.data.description);
   }
+}
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
