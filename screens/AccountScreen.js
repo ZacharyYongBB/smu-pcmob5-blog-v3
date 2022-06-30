@@ -1,5 +1,11 @@
 import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from "react";
@@ -26,15 +32,26 @@ export default function AccountScreen({ navigation }) {
       console.log("Error getting user name");
       if (error.response) {
         console.log(error.response.data);
+        if (error.response.data.status_code === 401) {
+          signOut();
+        }
       } else {
         console.log(error);
-        
       }
     }
   }
 
   useEffect(() => {
+    console.log("Setting up nav listener");
+    // Check for when we come back to this screen
+    const removeListener = navigation.addListener("focus", () => {
+      console.log("Running nav listener");
+      setUsername(<ActivityIndicator />);
+      getUsername();
+    });
     getUsername();
+
+    return removeListener;
   }, []);
 
 
